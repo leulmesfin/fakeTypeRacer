@@ -17,6 +17,18 @@
   display: inline-block;
 }
 
+.text-container {
+  color: gray; /* default color for all text is gray */
+}
+
+.correct {
+  color: green;
+}
+
+.incorrect {
+  color: red;
+}
+
 .text {
   font-size: 2em;
   letter-spacing: 1px;

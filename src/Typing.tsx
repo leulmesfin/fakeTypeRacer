@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react'
-import './App.css'
+import React, { useEffect, useRef, useState } from 'react';
+import './App.css';
+import CharStatus from './components/types.ts';
 
 const Typing = () => {
   const originalText = "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.";
   const [wpmCount, setWpmCount] = useState(0);
   const [typedInput, setTypedInput] = useState('');
+  const [statusArr, setStatusArr] = useState<CharStatus[]>([]);
   const [cursorPosition, setCursorPosition] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -17,7 +19,8 @@ const Typing = () => {
 
   /* on key press(when typedInput state changes), we will run the compareText function */
   useEffect(() => {
-    compareText(originalText, typedInput);
+    setStatusArr(compareText(originalText, typedInput));
+    // val is an array where each elt has the obj: {currChar, status}
   }, [typedInput])
 
   /* This function takes in 2 strings.
@@ -26,21 +29,22 @@ const Typing = () => {
    * If they don't match, turn OG character red
    * increment cursor for both cases */
   // fix console.log, return values instead
-  const compareText = (ogStr: string, typedStr: string)=>  {
+  const compareText = (ogStr: string, typedStr: string): CharStatus[] =>  {
     const ogChars = ogStr.split('');
     const typedChars = typedStr.split('');
 
-    ogChars.map( (currChar, index) => {
+    // returns an array where each char is assigned an obj detailing the char and status
+    const statusArr = ogChars.map( (currChar, index) => {
       if (index >= typedChars.length) {
-        console.log('untyped');
+        return {currChar, status: 'untyped'};
       }
       if (currChar === typedChars[index]) {
-        console.log('char match!');
+        return {currChar, status: 'correct'};
       } else {
-        console.log('char DID NOT match!');
+        return {currChar, status: 'incorrect'};
       }
     })
-
+    return statusArr;
   }
   /* This updates the state of the userInput field */
   const updateUserInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,11 +56,19 @@ const Typing = () => {
      <h1>FakeType</h1>
      <p>WPM: {wpmCount}</p>
     
+
     <div className="inputField">
       <input type="text" ref={inputRef} value={typedInput} onChange={updateUserInput}></input>
     </div>
      <div className="container">
-        <p className="text">{typedInput}</p> 
+        {
+          statusArr.map( (character) => (
+            <span className={character.status !== 'untyped' ? character.status : ''}> 
+              {character.currChar}
+            </span>
+          ))
+        }
+        {/* <p className="text">{typedInput}</p>  */}
      </div>
      <div className='typingText'>
       <h2>{originalText}</h2>
